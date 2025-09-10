@@ -43,24 +43,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         return;
       }
       
-      const propertyData = {
+      // Build query parameters for customer portal
+      const params = new URLSearchParams({
         address: address,
-        placeId: placesData.placeId,
-        formattedAddress: placesData.formattedAddress,
-        addressComponents: placesData.addressComponents,
-        latitude: placesData.latitude,
-        longitude: placesData.longitude,
-        county: placesData.county,
-        referralCode: referralCode
-      };
+        place_id: placesData.placeId,
+        formatted_address: placesData.formattedAddress || '',
+        lat: placesData.latitude?.toString() || '',
+        lng: placesData.longitude?.toString() || '',
+        county: placesData.county || '',
+        ...(referralCode && { ref: referralCode })
+      });
       
-      // Safe localStorage using custom hook
-      setPropertyData(propertyData);
-      
-      // Safe redirect using environment variables
-      if (typeof window !== 'undefined') {
-        window.location.href = `${APP_URLS.CUSTOMER_APP}/onboarding`;
-      }
+      // Redirect to customer portal /start route
+      window.location.href = `${APP_URLS.CUSTOMER_APP}/start?${params.toString()}`;
     }
   };
 

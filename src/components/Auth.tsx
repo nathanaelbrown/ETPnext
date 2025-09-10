@@ -25,7 +25,6 @@ export default function Auth() {
     setIsLoading(true);
 
     try {
-      // ✅ REPLACE authService with supabase:
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -39,6 +38,9 @@ export default function Auth() {
           description: "You've been signed in successfully.",
         });
         
+        // Get the session to transfer authentication
+        const { data: sessionData } = await supabase.auth.getSession();
+        
         // Check user permissions and redirect to React apps
         const { data: profile } = await supabase
           .from('profiles')
@@ -46,11 +48,22 @@ export default function Auth() {
           .eq('user_id', data.user.id)
           .single();
           
-        if (profile?.permissions === 'admin' || profile?.permissions === 'administrator') {
-          window.location.href = APP_URLS.ADMIN_APP;
-        } else {
-          window.location.href = APP_URLS.CUSTOMER_APP;
-        }
+          if (profile?.permissions === 'admin' || profile?.permissions === 'administrator') {
+            // For admin - simple redirect works (same auth domain)
+            window.location.href = APP_URLS.ADMIN_APP;
+          } else {
+            // For customer portal - pass session tokens in URL
+            const accessToken = sessionData.session?.access_token;
+            const refreshToken = sessionData.session?.refresh_token;
+            
+            if (accessToken && refreshToken) {
+              const finalUrl = `http://localhost:3002/?access_token=${accessToken}&refresh_token=${refreshToken}`;
+              window.location.href = finalUrl;
+            } else {
+              // Fallback - redirect to customer portal auth page
+              window.location.href = `http://localhost:3002/auth`;
+            }
+          }
       }
     } catch (error: any) {
       toast({
@@ -121,7 +134,6 @@ export default function Auth() {
     setIsLoading(true);
 
     try {
-      // ✅ REPLACE supabaseAuthService with supabase:
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {

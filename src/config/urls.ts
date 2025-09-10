@@ -1,5 +1,5 @@
 export const CUSTOMER_APP_URL =
-  process.env.NEXT_PUBLIC_CUSTOMER_APP_URL ?? 'http://localhost:3002';
+  process.env.NEXT_PUBLIC_CUSTOMER_APP_URL ?? 'http://localhost:3002/customer-portal';
 
 export const ADMIN_APP_URL =
   process.env.NEXT_PUBLIC_ADMIN_APP_URL ?? 'http://localhost:3001';

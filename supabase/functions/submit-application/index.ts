@@ -258,20 +258,21 @@ serve(async (req: Request) => {
     }
 
     // 10) Generate magic link to sign the user in immediately
-    const redirectTo = `${origin || ""}/customer-portal`;
-    const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
-      type: "magiclink",
-      email,
-      options: { redirectTo },
-    });
-    if (linkErr) throw new Error(`Failed to generate magic link: ${linkErr.message}`);
+ //   const redirectTo = `${origin || ""}/customer-portal`;
+ //   const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+ //    type: "magiclink",
+ //     email,
+ //     options: { redirectTo },
+ //   });
+ //   if (linkErr) throw new Error(`Failed to generate magic link: ${linkErr.message}`);
 
-    const magicLink = (linkData as any)?.action_link || (linkData as any)?.properties?.action_link || null;
+ //   const magicLink = (linkData as any)?.action_link || (linkData as any)?.properties?.action_link || null;
 
     return new Response(
-      JSON.stringify({ success: true, magicLink, userId, propertyId: property.id }),
+      JSON.stringify({ success: true, userId, propertyId: property.id }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
+
   } catch (error: any) {
     console.error("submit-application error:", error);
     return new Response(JSON.stringify({ success: false, error: error.message || "Unknown error" }), {

@@ -40,6 +40,8 @@ export default function Auth() {
         
         // Get the session to transfer authentication
         const { data: sessionData } = await supabase.auth.getSession();
+        console.log('🔍 Raw sessionData:', sessionData);
+        console.log('🔍 sessionData.session:', sessionData.session);
         
         // Check user permissions and redirect to React apps
         const { data: profile } = await supabase
@@ -48,22 +50,57 @@ export default function Auth() {
           .eq('user_id', data.user.id)
           .single();
           
-          if (profile?.permissions === 'admin' || profile?.permissions === 'administrator') {
-            // For admin - simple redirect works (same auth domain)
-            window.location.href = APP_URLS.ADMIN_APP;
-          } else {
-            // For customer portal - pass session tokens in URL
-            const accessToken = sessionData.session?.access_token;
-            const refreshToken = sessionData.session?.refresh_token;
+        if (profile?.permissions === 'admin' || profile?.permissions === 'administrator') {
+          // For admin - pass session tokens in URL like customer portal
+          const accessToken = sessionData.session?.access_token;
+          const refreshToken = sessionData.session?.refresh_token;
+          
+          console.log('🔍 Admin detected, redirecting in 5 seconds...');
+          console.log('🔍 Admin app URL:', APP_URLS.ADMIN_APP);
+          console.log('🔍 Access token exists:', !!accessToken);
+          console.log('🔍 Refresh token exists:', !!refreshToken);
+          
+          if (accessToken && refreshToken) {
+            const finalUrl = `${APP_URLS.ADMIN_APP}/auth/callback?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}`;
+            console.log('🔍 Admin redirect URL:', finalUrl);
             
-            if (accessToken && refreshToken) {
-              const finalUrl = `http://localhost:3002/?access_token=${accessToken}&refresh_token=${refreshToken}`;
+            setTimeout(() => {
               window.location.href = finalUrl;
-            } else {
-              // Fallback - redirect to customer portal auth page
-              window.location.href = `http://localhost:3002/auth`;
-            }
+            }, 5000);
+          } else {
+            console.log('❌ No tokens for admin, fallback redirect');
+            setTimeout(() => {
+              window.location.href = APP_URLS.ADMIN_APP;
+            }, 5000);
           }
+        } else {
+          // For customer portal - pass session tokens in URL
+          const accessToken = sessionData.session?.access_token;
+          const refreshToken = sessionData.session?.refresh_token;
+          
+          if (accessToken && refreshToken) {
+            // DEBUG LOGGING
+            console.log('🔍 Customer app URL:', APP_URLS.CUSTOMER_APP);
+            console.log('🔍 Access token exists:', !!accessToken);
+            console.log('🔍 Refresh token exists:', !!refreshToken);
+            console.log('🔍 Access token preview:', accessToken.substring(0, 50) + '...');
+            
+            const finalUrl = `http://localhost:3002/?access_token=${accessToken}&refresh_token=${refreshToken}`;
+            console.log('🔍 Final redirect URL:', finalUrl);
+            console.log('🔍 WAITING 10 SECONDS TO SEE LOGS...');
+            
+            // Wait 10 seconds so you can see the logs
+            setTimeout(() => {
+              window.location.href = finalUrl;
+            }, 10000);
+          } else {
+            // Fallback - redirect to customer portal auth page
+            console.log('❌ No tokens available, using fallback');
+            setTimeout(() => {
+              window.location.href = `http://localhost:3002/auth`;
+            }, 3000);
+          }
+        }
       }
     } catch (error: any) {
       toast({
@@ -251,9 +288,9 @@ export default function Auth() {
                     </button>
                   </div>
                   <div className="pt-4 border-t">
-                  <Link href={{ pathname: "/admin" }} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Admin Portal
-                  </Link>
+                    <Link href={{ pathname: "/admin" }} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      Admin Portal
+                    </Link>
                   </div>
                 </>
               ) : mode === 'signup' ? (

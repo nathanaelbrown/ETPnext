@@ -16,9 +16,9 @@ export const Footer = () => {
       { name: 'Consultation Services', url: '/services/consultation' }
     ],
     contact: {
-      phone: '(555) 012-3456',
+      phone: '(512) 548-8342',
       email: 'info@easytaxprotest.com',
-      address: '123 Business Plaza\nAustin, TX 78701'
+      address: '13809 Research Blvd., Suite 500\nAustin, TX 78750'
     },
     social: {
       facebook: '#',
@@ -26,7 +26,7 @@ export const Footer = () => {
       linkedin: '#'
     },
     legal: {
-      copyright: '© 2024 EasyTaxProtest.com. All rights reserved.',
+      copyright: '© 2025 EasyTaxProtest.com. All rights reserved.',
       privacy: 'Privacy Policy',
       privacyUrl: '/privacy-policy',
       terms: 'Terms of Service',
